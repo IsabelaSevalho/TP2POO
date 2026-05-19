@@ -2,41 +2,22 @@ package br.edu.uea.chat.model;
 
 public class Aluno extends Usuario{
 	
-	private String instituicaoDeEnsino;
-	private String curso;
-	private float notaUltimoENEM;
+	private int anoDeIngresso;
 	
 	public Aluno() {}
 
-	public Aluno(String cpf, String nome, String email, String instituicaoDeEnsino, String curso, float notaUltimoENEM, String senha) {
-		super(cpf, nome, email, senha);
-		this.instituicaoDeEnsino = instituicaoDeEnsino;
-		this.curso = curso;
-		this.notaUltimoENEM = notaUltimoENEM;
+	public Aluno(String user, String senha, int anoDeIngresso) {
+		super(user, senha);
+		this.anoDeIngresso = anoDeIngresso;
 	}
 
-	public String getInstituicaoDeEnsino() {
-		return instituicaoDeEnsino;
+	public int getAnoDeIngresso() {
+		return anoDeIngresso;
 	}
 
-	public String getCurso() {
-		return curso;
+	public void setAnoDeIngresso(int anoDeIngresso) {
+		this.anoDeIngresso = anoDeIngresso;
 	}
 
-	public float getNotaUltimoENEM() {
-		return notaUltimoENEM;
-	}
-
-	public void setInstituicaoDeEnsino(String instituicaoDeEnsino) {
-		this.instituicaoDeEnsino = instituicaoDeEnsino;
-	}
-
-	public void setCurso(String curso) {
-		this.curso = curso;
-	}
-
-	public void setNotaUltimoENEM(float notaUltimoENEM) {
-		this.notaUltimoENEM = notaUltimoENEM;
-	}
 
 }
