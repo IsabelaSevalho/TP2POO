@@ -8,6 +8,13 @@ import br.edu.uea.chat.model.Professor;
 import br.edu.uea.chat.model.Tecnico;
 import br.edu.uea.chat.model.Usuario;
 
+/**
+ * Esta classe serve para capturar eventos da view e executar açoes referentes ao usuário, como cadastro e listagem
+ * 
+ * @author Isabela Cunha
+ * @version 1.0
+ */
+
 public class UsuarioController {
 	private ArrayList<Usuario> usuarios;
 	

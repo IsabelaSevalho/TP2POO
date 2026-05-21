@@ -1,5 +1,12 @@
 package br.edu.uea.chat.model;
 
+/**
+ * Esta classe serve estabelece as regras de negócio do Usuário (superclasse)
+ * 
+ * @author Isabela Cunha
+ * @version 1.0
+ */
+
 public abstract class Usuario {
 	private String user;
 	private String senha;

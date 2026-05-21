@@ -2,6 +2,13 @@ package br.edu.uea.chat.model;
 
 import java.io.Serializable;
 
+/**
+ * Esta classe serve estabelece as regras de negócio das mensagens
+ * 
+ * @author Isabela Cunha
+ * @version 1.0
+ */
+
 public class Mensagem implements Serializable{
 	private String remetente;
 	private String destinatario;
