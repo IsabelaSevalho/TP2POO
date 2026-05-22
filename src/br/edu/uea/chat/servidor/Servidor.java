@@ -3,12 +3,9 @@ package br.edu.uea.chat.servidor;
 import java.io.IOException;
 import java.net.*;
 
-import br.edu.uea.chat.cliente.ClienteThread;
-
 /**
  * Esta classe serve para estabelecer conexão com uma porta, de modo a permitir a comunicação entre usuários pela porta 5000
  * 
- * @author Isabela Cunha
  * @version 1.0
  */
 

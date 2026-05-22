@@ -3,7 +3,6 @@ package br.edu.uea.chat.model;
 /**
  * Esta classe serve estabelece as regras de negócio do Professor
  * 
- * @author Isabela Cunha
  * @version 1.0
  */
 

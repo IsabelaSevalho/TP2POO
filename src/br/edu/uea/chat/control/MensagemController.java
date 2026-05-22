@@ -3,7 +3,6 @@ package br.edu.uea.chat.control;
 /**
  * Esta classe serve para capturar eventos da view e executar açoes referentes à troca de mensagens, solicitando uma comunicação com o servidor
  * 
- * @author Isabela Cunha
  * @version 1.0
  */
 

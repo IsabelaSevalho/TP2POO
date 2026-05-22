@@ -5,7 +5,6 @@ import br.edu.uea.chat.servidor.Servidor;
 /**
  * Esta classe serve para executar o processo do servidor
  * 
- * @author Isabela Cunha
  * @version 1.0
  */
 

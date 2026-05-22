@@ -5,7 +5,6 @@ import java.io.Serializable;
 /**
  * Esta classe serve estabelece as regras de negócio das mensagens
  * 
- * @author Isabela Cunha
  * @version 1.0
  */
 

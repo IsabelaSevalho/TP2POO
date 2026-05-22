@@ -6,6 +6,13 @@ import java.io.ObjectOutputStream;
 import java.net.Socket;
 import br.edu.uea.chat.model.Mensagem;
 
+/**
+ * Esta classe faz o gerenciamento do socket, emite comandos e recebe respostas do servidor
+ * Conecta o servidor, envia objetos e recebe respostas
+ * 
+ * @version 1.0
+ */
+
 public class Cliente {
     
     private Socket socket;
@@ -30,7 +37,7 @@ public class Cliente {
             this.conectado = true;
 
             // Inicia a Thread
-            new Thread(new EscutadorServidor()).start();
+            new Thread(new ServidorThread()).start();
             
             return true;
         } catch (IOException e) {
