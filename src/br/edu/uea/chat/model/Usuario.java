@@ -1,13 +1,16 @@
 package br.edu.uea.chat.model;
 
+import java.io.Serializable;
+
 /**
- * Esta classe serve estabelece as regras de negócio do Usuário (superclasse)
+ * Esta classe serve estabelece as regras de negócio do Usuário (superclasse).
+ * Ela implemeta Serializable para poder converter o objeto em bytes para ser
+ * enviado pela rede e reconstruido ao chegar no destino
  * 
- * @author Isabela Cunha
- * @version 1.0
+ * @version 2.0
  */
 
-public abstract class Usuario {
+public abstract class Usuario implements Serializable{
 	private String user;
 	private String senha;
 	private boolean status;
