@@ -39,10 +39,13 @@ public abstract class Usuario implements Serializable{
 		this.status = status;
 	}
 	
+	public String getSenha() {
+		return this.senha;
+	}
+
 	public void setSenha(String senha) {
 		this.senha = senha;
 	}
-	
 	
 	public boolean login(String senha) {
 		return this.senha.equals(senha);

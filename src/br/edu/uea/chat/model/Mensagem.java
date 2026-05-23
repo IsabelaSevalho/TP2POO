@@ -3,52 +3,36 @@ package br.edu.uea.chat.model;
 import java.io.Serializable;
 
 /**
- * Esta classe serve estabelece as regras de negócio das mensagens
+ * Esta classe representa o protocolo de comunicação entre Cliente e Servidor.
+ * Carrega a ação desejada, os dados do usuário e o conteúdo textual.
  * 
- * @version 1.0
+ * @version 2.0
  */
 
 public class Mensagem implements Serializable{
-	private String remetente;
+	private String acao; //cadastrar, listar, kill, mandar texto, logar
 	private String destinatario;
-	private String assunto;
-	private String mensagem;
+	private Usuario usuario;
+	private String texto;
 	
-	public Mensagem(String remetente, String destinatario, String assunto, String mensagem) {
-		super();
-		this.remetente = remetente;
+	public Mensagem(String acao, String destinatario, Usuario usuario, String texto) {
+		this.acao = acao;
 		this.destinatario = destinatario;
-		this.assunto = assunto;
-		this.mensagem = mensagem;
+		this.usuario = usuario;
+		this.texto = texto;
 	}
 	
 	@Override
-    public String toString() {
-        return "De: "+remetente+"\nPara: "+destinatario+"\nAssunto: "+assunto+"\nMensagem: " + mensagem;
-    }
-
-	public String getAssunto() {
-		return assunto;
+	public String toString() {
+		return "Ação: " + acao + " | Texto: " + texto;
 	}
 
-	public void setAssunto(String assunto) {
-		this.assunto = assunto;
+	public String getAcao() {
+		return acao;
 	}
 
-	public String getMensagem() {
-		return mensagem;
-	}
-
-	public void setMensagem(String mensagem) {
-		this.mensagem = mensagem;
-	}
-
-	public String getRemetente() {
-		return remetente;
-	}
-
-	public void setRemetente(String remetente) {
-		this.remetente = remetente;
+	public void setAcao(String acao) {
+		this.acao = acao;
 	}
 
 	public String getDestinatario() {
@@ -57,6 +41,22 @@ public class Mensagem implements Serializable{
 
 	public void setDestinatario(String destinatario) {
 		this.destinatario = destinatario;
+	}
+
+	public Usuario getUsuario() {
+		return usuario;
+	}
+
+	public void setUsuario(Usuario usuario) {
+		this.usuario = usuario;
+	}
+
+	public String getTexto() {
+		return texto;
+	}
+
+	public void setTexto(String texto) {
+		this.texto = texto;
 	}
 	
 	

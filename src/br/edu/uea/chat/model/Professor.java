@@ -7,7 +7,7 @@ package br.edu.uea.chat.model;
  */
 
 public class Professor extends Usuario{
-	
+	private static final long serialVersionUID = 1L; 
 	private String titulacao;
 	
 	public Professor() {}

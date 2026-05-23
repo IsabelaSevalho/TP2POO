@@ -7,7 +7,8 @@ package br.edu.uea.chat.model;
  */
 
 public class Tecnico extends Usuario{
-	
+	private static final long serialVersionUID = 1L; 
+
 	public Tecnico() {}
 	
 	public Tecnico(String user, String senha) {
