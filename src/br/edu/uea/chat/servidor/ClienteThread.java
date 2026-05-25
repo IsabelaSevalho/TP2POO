@@ -55,7 +55,6 @@ public class ClienteThread extends Thread{
 
                     switch(acao){
                         case "CADASTRO":
-                            // Verifica se o usuário logado é técnico
                             if (usuarioLogado == null || !(usuarioLogado instanceof Tecnico)) {
                                 enviarObjetoAoServidor("ERRO_PERMISSAO: Apenas técnicos podem cadastrar usuários.");
                                 System.out.println("Servidor/ClienteThread: Tentativa de cadastro sem permissão.");
@@ -76,11 +75,9 @@ public class ClienteThread extends Thread{
                             boolean loginRealizado = usuarioControl.login(usuarioLogin.getUser(), usuarioLogin.getSenha());
 
                             if(loginRealizado){
-                                // Busca o objeto real do banco (ex: Técnico ou Aluno)
                                 this.usuarioLogado = usuarioControl.buscarUsuario(usuarioLogin.getUser());
                                 Servidor.addClienteOnline(this);
                                 
-                                // CORREÇÃO DEFINITIVA: Envia o objeto real encontrado de volta para o Cliente!
                                 enviarObjetoAoServidor(this.usuarioLogado); 
                                 System.out.println("Servidor/ClienteThread: Usuário " + this.usuarioLogado.getUser() + " entrou online.");
 
@@ -96,7 +93,6 @@ public class ClienteThread extends Thread{
 
 
                         case "LISTAR":
-                            // Gera lista com status online/offline
                             ArrayList<Usuario> todosUsuarios = usuarioControl.getUsuarios();
                             ArrayList<Usuario> listaComStatus = new ArrayList<>();
                             
@@ -222,7 +218,7 @@ public class ClienteThread extends Thread{
                 objectOS.flush();
             }
         } catch (IOException e) {
-            System.out.println("Servidor/ClienteThread: Erro ao enviar objeto ao cliente.");
+            System.err.println("Servidor/ClienteThread: Erro ao enviar objeto ao cliente.");
         }
     }
 
@@ -232,7 +228,7 @@ public class ClienteThread extends Thread{
                 socket.close();
             }
         } catch (IOException e) {
-            System.out.println("Servidor/ClienteThread: Erro ao fechar socket.");
+            System.err.println("Servidor/ClienteThread: Erro ao fechar socket.");
         }
     }
 }

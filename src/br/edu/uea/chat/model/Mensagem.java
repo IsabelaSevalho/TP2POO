@@ -10,7 +10,7 @@ import java.io.Serializable;
  */
 
 public class Mensagem implements Serializable{
-	private String acao; //cadastrar, listar, kill, mandar texto, logar
+	private String acao;
 	private String destinatario;
 	private Usuario usuario;
 	private String texto;

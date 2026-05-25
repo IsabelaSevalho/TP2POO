@@ -169,7 +169,6 @@ public class TelaChat {
 
     private void enviarCadastro(Usuario usuario) {
         Mensagem msg = new Mensagem("CADASTRO", null, usuario, null);
-        // Mudamos para enviar apenas o comando, sem travar a tela esperando o readObject
         cliente.enviarComandoSemResposta(msg); 
         System.out.println("Solicitação de cadastro enviada ao servidor. Aguarde a confirmação no chat...");
     }

@@ -31,7 +31,7 @@ public class MensagemDAO {
 			System.out.println("MensagemDAO: Banco de dados offline atualizado.");
 
 		} catch (IOException e) {
-			System.out.println("MensagemDAO: Erro ao salvar mensagens offline.");
+			System.err.println("MensagemDAO: Erro ao salvar mensagens offline.");
 			e.printStackTrace();
 		}
 	}
@@ -49,8 +49,7 @@ public class MensagemDAO {
 			fileIS.close();
             
 		} catch (IOException e) {
-			//Se o arquivo não existir, retorna a lista vazia sem estourar erro
-			System.out.println("MensagemDAO: Nenhum histórico de mensagens pendentes encontrado.");
+			System.err.println("MensagemDAO: Nenhum histórico de mensagens pendentes encontrado.");
 		} catch (ClassNotFoundException e) {
 			e.printStackTrace();
 		}

@@ -31,7 +31,6 @@ public class Cliente {
     public Usuario getUsuarioLogado() {
         return this.usuarioLogado;
     }
-
     
     public boolean conectar(String ip) {
          try {
@@ -43,7 +42,6 @@ public class Cliente {
             this.entrada = new ObjectInputStream(socket.getInputStream());
             this.conectado = true;
             
-            System.out.println("Cliente: Conectado com sucesso na porta 5000.");
             return true;
         } catch (IOException e) {
             System.err.println("Erro ao conectar: " + e.getMessage());
@@ -58,15 +56,12 @@ public class Cliente {
             
             saida.writeObject(protocoloLogin);
             saida.flush();
-            System.out.println("Cliente: Solicitação de login enviada.");
             
-            //ler a confirmação do Servidor antes de disparar a Thread
             Object resposta = entrada.readObject();
             
             if (resposta instanceof String && "CONFIRMACAO_LOGIN_OK".equals(resposta)) {
                 this.usuarioLogado = usuario;
                 
-                // Inicializa a thread de escuta passando a stream de entrada 
                 ServidorThread ouvinte = new ServidorThread(this.socket, this.entrada);
                 new Thread(ouvinte).start();
             }
@@ -83,7 +78,6 @@ public class Cliente {
             
             saida.writeObject(protocoloListar);
             saida.flush();
-            System.out.println("Cliente: Pedido de listagem enviado ao servidor.");
         
         } catch (IOException e) {
             System.err.println("Erro ao pedir status: " + e.getMessage());
@@ -107,7 +101,6 @@ public class Cliente {
             Mensagem protocoloKill = new Mensagem("KILL", alvos, null, null);
             saida.writeObject(protocoloKill);
             saida.flush();
-            System.out.println("Cliente: Comando de derrubada enviado pelo Tecnico.");
         
         } catch (IOException e) {
             System.err.println("Erro ao disparar comando KILL: " + e.getMessage());
@@ -132,14 +125,11 @@ public class Cliente {
             saida.writeObject(protocoloLogin);
             saida.flush();
 
-            // O cliente lê o objeto que o Servidor enviou
             Object resposta = entrada.readObject();
             
-            // Se a resposta for a instância real do Usuário (Tecnico/Aluno/Professor)
             if (resposta instanceof Usuario) {
-                this.usuarioLogado = (Usuario) resposta; // Guarda a instância correta vinda do banco!
+                this.usuarioLogado = (Usuario) resposta;
                 
-                // Inicializa a thread de escuta
                 ServidorThread ouvinte = new ServidorThread(this.socket, this.entrada);
                 new Thread(ouvinte).start();
                 return true;
@@ -152,7 +142,6 @@ public class Cliente {
         }
     }
 
-    // Método para enviar comando e aguardar resposta 
     public Object enviarComandoComResposta(Mensagem msg) {
         if (!conectado) return null;
         try {

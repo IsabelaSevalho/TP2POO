@@ -57,9 +57,9 @@ public class ServidorThread implements Runnable {
                 }
             }
         } catch (IOException e) {
-            System.out.println("\nConexão com o servidor foi encerrada.");
+            System.err.println("\nConexão com o servidor foi encerrada.");
         } catch (ClassNotFoundException e) {
-            System.out.println("Erro ao processar dado recebido.");
+            System.err.println("Erro ao processar dado recebido.");
         }
     }
 
@@ -98,7 +98,7 @@ public class ServidorThread implements Runnable {
             if (objectIS != null) objectIS.close();
             if (socket != null && !socket.isClosed()) socket.close();
         } catch (IOException e) {
-            System.out.println("Erro ao fechar conexão.");
+            System.err.println("Erro ao fechar conexão.");
         }
     }
 }

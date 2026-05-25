@@ -19,9 +19,8 @@ public class Servidor extends Thread {
         this.mensagemController = new MensagemController();
 
         if (this.usuarioController.getTecnicos().isEmpty()) {
-        Tecnico admin = new Tecnico("admin_tec", "1234");
-        this.usuarioController.cadastrarUsuario(admin);
-        System.out.println("Técnico inicial criado: login=admin_tec, senha=1234");
+            Tecnico admin = new Tecnico("admin_tec", "1234");
+            this.usuarioController.cadastrarUsuario(admin);
         }
     }
 
@@ -52,7 +51,6 @@ public class Servidor extends Thread {
     public static void addClienteOnline(ClienteThread ct) { clientesOnline.add(ct); }
     public static void removeClienteOnline(ClienteThread ct) { clientesOnline.remove(ct); }
 
-    // MÉTODO MAIN AQUI
     public static void main(String[] args) {
         Servidor servidor = new Servidor();
         servidor.start();
