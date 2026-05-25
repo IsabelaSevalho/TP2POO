@@ -35,10 +35,16 @@ public class TelaChat {
             return;
         }
 
-        if (!fazerLogin()) {
-            System.out.println("Login falhou. Encerrando.");
-            cliente.desconectar();
-            return;
+        while (!fazerLogin()) {
+            System.out.println("Login falhou. Tente novamente.");
+            System.out.print("Deseja tentar de novo? (S/N): ");
+            String resposta = leitor.readLine();
+            
+            if (resposta.equalsIgnoreCase("N")) {
+                System.out.println("Encerrando o programa...");
+                cliente.desconectar();
+                return;
+            }
         }
 
         System.out.println("\nBem-vindo, " + usuarioLogado.getUser() + "!");

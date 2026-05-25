@@ -17,6 +17,12 @@ public class Servidor extends Thread {
     public Servidor() {
         this.usuarioController = new UsuarioController();
         this.mensagemController = new MensagemController();
+
+        if (this.usuarioController.getTecnicos().isEmpty()) {
+        Tecnico admin = new Tecnico("admin_tec", "1234");
+        this.usuarioController.cadastrarUsuario(admin);
+        System.out.println("Técnico inicial criado: login=admin_tec, senha=1234");
+        }
     }
 
     public void run() {
@@ -48,14 +54,6 @@ public class Servidor extends Thread {
 
     // MÉTODO MAIN AQUI
     public static void main(String[] args) {
-        // Cria técnico inicial se não houver nenhum
-        UsuarioController uc = new UsuarioController();
-        if (uc.getTecnicos().isEmpty()) {
-            Tecnico admin = new Tecnico("admin_tec", "1234");
-            uc.cadastrarUsuario(admin);
-            System.out.println("Técnico inicial criado: login=admin_tec, senha=1234");
-        }
-
         Servidor servidor = new Servidor();
         servidor.start();
         System.out.println("Servidor iniciado. Pressione Enter para encerrar.");

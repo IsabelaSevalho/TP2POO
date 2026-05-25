@@ -30,10 +30,16 @@ public class TelaServidor {
             return;
         }
 
-        if (!fazerLoginTecnico()) {
-            System.out.println("Login falhou. Apenas técnicos podem acessar.");
-            cliente.desconectar();
-            return;
+        while (!fazerLoginTecnico()) {
+            System.out.println("Login falhou. Tente novamente.");
+            System.out.print("Deseja tentar de novo? (S/N): ");
+            String resposta = leitor.readLine();
+            
+            if (resposta.equalsIgnoreCase("N")) {
+                System.out.println("Encerrando o programa...");
+                cliente.desconectar();
+                return;
+            }
         }
 
         System.out.println("\n--- MODO ADMINISTRADOR (TÉCNICO) ATIVADO ---");
@@ -168,14 +174,6 @@ public class TelaServidor {
             return Integer.parseInt(linha);
         } catch (NumberFormatException e) {
             return -1;
-        }
-    }
-
-    public static void main(String[] args) {
-        try {
-            new TelaServidor().iniciar();
-        } catch (IOException e) {
-            System.out.println("Erro de I/O: " + e.getMessage());
         }
     }
 }
