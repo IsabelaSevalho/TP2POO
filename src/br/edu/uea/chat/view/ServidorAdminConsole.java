@@ -11,17 +11,25 @@ import br.edu.uea.chat.model.Professor;
 import br.edu.uea.chat.model.Tecnico;
 import br.edu.uea.chat.model.Usuario;
 
-public class TelaServidor {
+/**
+ * Console administrativo do servidor - apenas para TÉCNICOS.
+ * Usa BufferedReader para entrada.
+ * 
+ * @version 2.0
+ */
+public class ServidorAdminConsole {
     private Cliente cliente;
     private BufferedReader leitor;
+    private boolean logadoComoTecnico;
 
-    public TelaServidor() {
+    public ServidorAdminConsole() {
         cliente = new Cliente();
         leitor = new BufferedReader(new InputStreamReader(System.in));
+        logadoComoTecnico = false;
     }
 
     public void iniciar() throws IOException {
-        System.out.println("=== SERVIDOR CHAT UEA - MÓDULO ADMINISTRATIVO ===");
+        System.out.println("=== MÓDULO ADMINISTRATIVO DO SERVIDOR ===");
         System.out.print("Digite o IP do servidor: ");
         String ip = leitor.readLine();
 
@@ -31,12 +39,12 @@ public class TelaServidor {
         }
 
         if (!fazerLoginTecnico()) {
-            System.out.println("Login falhou. Apenas técnicos podem acessar.");
-            cliente.desconectar();
+            System.out.println("Login falhou. Encerrando.");
             return;
         }
 
-        System.out.println("\n--- MODO ADMINISTRADOR (TÉCNICO) ATIVADO ---");
+        logadoComoTecnico = true;
+        System.out.println("Login técnico realizado com sucesso!\n");
 
         int opcao;
         do {
@@ -56,42 +64,35 @@ public class TelaServidor {
                     listarUsuarios();
                     break;
                 case 5:
-                    derrubarUsuarios();
-                    break;
-                case 6:
                     System.out.println("Encerrando módulo servidor...");
                     break;
                 default:
                     System.out.println("Opção inválida.");
             }
-        
-            System.out.println("\nPressione Enter para continuar...");
-            leitor.readLine();
-           
-        } while (opcao != 6);
+        } while (opcao != 5);
 
         cliente.desconectar();
     }
 
     private boolean fazerLoginTecnico() throws IOException {
-        System.out.println("\n--- LOGIN DE TÉCNICO ---");
+        System.out.println("\n--- Login de Técnico ---");
         System.out.print("Login: ");
         String login = leitor.readLine();
         System.out.print("Senha: ");
         String senha = leitor.readLine();
 
         Tecnico tecnico = new Tecnico(login, senha);
+    
         return cliente.loginSincrono(tecnico);
     }
 
     private void exibirMenu() {
-        System.out.println("\n=== MENU TÉCNICO ===");
+        System.out.println("\n--- MENU TÉCNICO ---");
         System.out.println("1. Cadastrar Professor");
         System.out.println("2. Cadastrar Aluno");
         System.out.println("3. Cadastrar Técnico");
         System.out.println("4. Listar todos os usuários (com status)");
-        System.out.println("5. Derrubar conexão de usuário(s)");
-        System.out.println("6. Sair");
+        System.out.println("5. Sair");
     }
 
     private void cadastrarProfessor() throws IOException {
@@ -139,26 +140,7 @@ public class TelaServidor {
 
     private void listarUsuarios() {
         cliente.solicitarStatusUsuarios();
-        System.out.println("Solicitação de listagem enviada. Aguarde a exibição...");
-    }
-
-    private void derrubarUsuarios() throws IOException {
-        System.out.println("Digite o(s) login(s) dos usuários a derrubar (separados por vírgula)");
-        System.out.println("Ou digite 'TODOS' para derrubar todos: ");
-        String alvos = leitor.readLine();
-        if (alvos == null || alvos.trim().isEmpty()) {
-            System.out.println("Nenhum alvo informado.");
-            return;
-        }
-        Mensagem msg = new Mensagem("KILL", alvos, null, null);
-        Object resposta = cliente.enviarComandoComResposta(msg);
-        if (resposta != null && resposta instanceof String && ((String)resposta).startsWith("ERRO_PERMISSAO")) {
-            System.out.println("Erro de permissão: apenas técnicos podem derrubar conexões.");
-        } else if (resposta != null && resposta instanceof String && ((String)resposta).startsWith("KILL_OK")) {
-            System.out.println("Comando executado: " + resposta);
-        } else {
-            System.out.println("Comando KILL enviado.");
-        }
+        System.out.println("Pedido de listagem enviado. Aguarde a resposta no console.");
     }
 
     private int lerInteiro(String mensagem) throws IOException {
@@ -167,13 +149,13 @@ public class TelaServidor {
         try {
             return Integer.parseInt(linha);
         } catch (NumberFormatException e) {
-            return -1;
+            return 0;
         }
     }
 
     public static void main(String[] args) {
         try {
-            new TelaServidor().iniciar();
+            new ServidorAdminConsole().iniciar();
         } catch (IOException e) {
             System.out.println("Erro de I/O: " + e.getMessage());
         }

@@ -4,15 +4,14 @@ import java.io.IOException;
 import java.io.ObjectInputStream;
 import java.io.ObjectOutputStream;
 import java.net.Socket;
-
+import br.edu.uea.chat.cliente.ServidorThread;
 import br.edu.uea.chat.model.Mensagem;
 import br.edu.uea.chat.model.Usuario;
 
 /**
  * Esta classe faz o gerenciamento do socket, emite comandos e recebe respostas do servidor
  * Conecta o servidor, envia objetos e recebe respostas
- * 
- * @version 2.0
+ * * @version 3.0
  */
 
 public class Cliente {
@@ -22,11 +21,7 @@ public class Cliente {
     private ObjectInputStream entrada;
     private boolean conectado;
     private Usuario usuarioLogado;
-    
-    // deixe alguns comentarios durante o codigo 
-    // EU ODEIO VOCE COM TODA A MINHA ALMA SOCKET E THEREAD COMO EU TE ODEIO 
-    //METODOS DA NOSSA HUMILDE CLIENTELA
-   
+    private Object ultimaResposta;
     
     public Cliente() {
         this.conectado = false;
@@ -41,31 +36,36 @@ public class Cliente {
 
             this.entrada = new ObjectInputStream(socket.getInputStream());
             this.conectado = true;
-
-            // Inicia a Thread
-            ServidorThread ouvinte = new ServidorThread(this.socket);
-            new Thread(ouvinte).start();
             
             System.out.println("Cliente: Conectado com sucesso na porta 5000.");
             return true;
-
         } catch (IOException e) {
-            System.err.println("Erro ao conectar no servidor: " + e.getMessage());
-            this.conectado = false;
+            System.err.println("Erro ao conectar: " + e.getMessage());
             return false;
         }
     }
     
     public void efetuarLogin(Usuario usuario) {
         if (!conectado) return;
-        
         try {
             Mensagem protocoloLogin = new Mensagem("LOGIN", null, usuario, null);
             
             saida.writeObject(protocoloLogin);
             saida.flush();
             System.out.println("Cliente: Solicitação de login enviada.");
-        } catch (IOException e) {
+            
+            //ler a confirmação do Servidor antes de disparar a Thread
+            Object resposta = entrada.readObject();
+            
+            if (resposta instanceof String && "CONFIRMACAO_LOGIN_OK".equals(resposta)) {
+                this.usuarioLogado = usuario;
+                
+                // Inicializa a thread de escuta passando a stream de entrada 
+                ServidorThread ouvinte = new ServidorThread(this.socket, this.entrada);
+                new Thread(ouvinte).start();
+            }
+
+        } catch (Exception e) {
             System.err.println("Erro ao tentar logar: " + e.getMessage());
         }
     }
@@ -84,15 +84,14 @@ public class Cliente {
         }
     }
 
-    public void enviarMensagemDeTexto(String loginDestinatario, String textoConversa) {
+    public void enviarMensagemDeTexto(String destinatario, String texto) {
         if (!conectado) return;
         try {
-            Mensagem protocoloTexto = new Mensagem("TEXTO", loginDestinatario, null, textoConversa);
-            saida.writeObject(protocoloTexto);
+            Mensagem msg = new Mensagem("TEXTO", destinatario, this.usuarioLogado, texto);
+            saida.writeObject(msg);
             saida.flush();
-
         } catch (IOException e) {
-            System.err.println("Erro ao enviar mensagem de texto: " + e.getMessage());
+            System.err.println("Erro ao enviar mensagem: " + e.getMessage());
         }
     }
 
@@ -108,5 +107,50 @@ public class Cliente {
             System.err.println("Erro ao disparar comando KILL: " + e.getMessage());
         }
     }
-}
+    
+    public void desconectar() {
+        try {
+            if (saida != null) saida.close();
+            if (entrada != null) entrada.close();
+            if (socket != null) socket.close();
+            this.conectado = false;
+        } catch (IOException e) {
+            System.err.println("Erro ao desconectar cliente: " + e.getMessage());
+        }
+    }
+    
+    public boolean loginSincrono(Usuario usuario) {
+        if (!conectado) return false;
+        try {
+            Mensagem protocoloLogin = new Mensagem("LOGIN", null, usuario, null);
+            saida.writeObject(protocoloLogin);
+            saida.flush();
 
+            Object resposta = entrada.readObject();
+            if ("CONFIRMACAO_LOGIN_OK".equals(resposta)) {
+                this.usuarioLogado = usuario;
+                // Inicializa a thread de escuta
+                ServidorThread ouvinte = new ServidorThread(this.socket, this.entrada);
+                new Thread(ouvinte).start();
+                return true;
+            }
+            return false;
+        } catch (Exception e) {
+            System.err.println("Erro no login síncrono: " + e.getMessage());
+            return false;
+        }
+    }
+
+    // Método para enviar comando e aguardar resposta 
+    public Object enviarComandoComResposta(Mensagem msg) {
+        if (!conectado) return null;
+        try {
+            saida.writeObject(msg);
+            saida.flush();
+            return entrada.readObject();
+        } catch (Exception e) {
+            System.err.println("Erro no comando com resposta: " + e.getMessage());
+            return null;
+        }
+    }
+}

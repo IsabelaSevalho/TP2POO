@@ -3,60 +3,72 @@ package br.edu.uea.chat.servidor;
 import java.io.IOException;
 import java.net.*;
 import java.util.ArrayList;
+import br.edu.uea.chat.control.UsuarioController;
+import br.edu.uea.chat.control.MensagemController;
+import br.edu.uea.chat.model.Tecnico;
 
-/**
- * Esta classe serve para estabelecer conexão com uma porta, de modo a permitir a comunicação entre usuários pela porta 5000
- * 
- * Essa versão abre a porta 5000, espera uma conexão com cliente (ClienteThread),
- * inicia a thread e fecha as conexões ao finalizar o servidor
- * 
- * @version 2.0
- */
+public class Servidor extends Thread {
+    private static final int PORTA = 5000;
+    private ServerSocket serverSocket;
+    private UsuarioController usuarioController;
+    private MensagemController mensagemController;
+    private static ArrayList<ClienteThread> clientesOnline = new ArrayList<>();
 
-//processo independente
-public class Servidor extends Thread{
-	private static final int PORTA = 5000;
-	private ServerSocket serverSocket;
+    public Servidor() {
+        this.usuarioController = new UsuarioController();
+        this.mensagemController = new MensagemController();
+    }
 
-	private static ArrayList<ClienteThread> clientesOnline = new ArrayList<>();
-	
-	public void run(){
-		//criando servidor
-		try {
-			serverSocket = new ServerSocket(PORTA);
-			
-			while (true) {
-	            System.out.println("Aguardando conexão...");
-	            Socket connection = serverSocket.accept();
+    public void run() {
+        try {
+            serverSocket = new ServerSocket(PORTA);
+            System.out.println("Servidor iniciado na porta " + PORTA);
+            while (true) {
+                System.out.println("Aguardando conexão...");
+                Socket connection = serverSocket.accept();
+                System.out.println("Cliente conectado: " + connection.getInetAddress().getHostName());
+                ClienteThread clienteThread = new ClienteThread(connection, this);
+                clienteThread.start();
+            }
+        } catch (IOException e) {
+            e.printStackTrace();
+        }
+    }
 
-	            System.out.println("Cliente conectado: "+ connection.getInetAddress().getHostName());
-	            ClienteThread clienteThread = new ClienteThread(connection);
+    public UsuarioController getUsuarioController() { return usuarioController; }
+    public MensagemController getMensagemController() { return mensagemController; }
 
-	            clienteThread.start();
-	        }
-		} catch (IOException e) {
-			e.printStackTrace();
-		}
-	}
-	
-	
-	public void close() throws IOException {
-		if(serverSocket != null) {
-			serverSocket.close();
-			System.out.println("Fechando conexões.");
-		}
-	}
+    public void close() throws IOException {
+        if (serverSocket != null) serverSocket.close();
+    }
 
-	public static ArrayList<ClienteThread> getClientesOnline(){
-		return clientesOnline;
-	}
+    public static ArrayList<ClienteThread> getClientesOnline() { return clientesOnline; }
+    public static void addClienteOnline(ClienteThread ct) { clientesOnline.add(ct); }
+    public static void removeClienteOnline(ClienteThread ct) { clientesOnline.remove(ct); }
 
-	public static void addClienteOnline(ClienteThread clienteOnline){
-		clientesOnline.add(clienteOnline);
-	}
+    // MÉTODO MAIN AQUI
+    public static void main(String[] args) {
+        // Cria técnico inicial se não houver nenhum
+        UsuarioController uc = new UsuarioController();
+        if (uc.getTecnicos().isEmpty()) {
+            Tecnico admin = new Tecnico("admin_tec", "1234");
+            uc.cadastrarUsuario(admin);
+            System.out.println("Técnico inicial criado: login=admin_tec, senha=1234");
+        }
 
-	public static void removeClienteOnline(ClienteThread clienteOnline){
-		clientesOnline.remove(clienteOnline);
-	}
-	
+        Servidor servidor = new Servidor();
+        servidor.start();
+        System.out.println("Servidor iniciado. Pressione Enter para encerrar.");
+        try {
+            System.in.read();
+        } catch (IOException e) {
+            e.printStackTrace();
+        }
+        try {
+            servidor.close();
+        } catch (IOException e) {
+            e.printStackTrace();
+        }
+        System.exit(0);
+    }
 }
