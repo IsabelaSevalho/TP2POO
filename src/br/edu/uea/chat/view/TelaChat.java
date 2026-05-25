@@ -107,7 +107,8 @@ public class TelaChat {
             System.out.println("3. Cadastrar Técnico");
             System.out.println("4. Listar todos os usuários (com status)");
             System.out.println("5. Derrubar conexão de usuário(s)");
-            System.out.println("6. Sair");
+            System.out.println("6. Enviar mensagem");
+            System.out.println("7. Sair");
             opcao = lerInteiro("Opção: ");
             
             switch (opcao) {
@@ -115,8 +116,9 @@ public class TelaChat {
                 case 2: cadastrarAluno(); break;
                 case 3: cadastrarTecnico(); break;
                 case 4: listarUsuarios(); break;
-                case 5: derrorbarUsuarios(); break;
-                case 6: System.out.println("Encerrando módulo técnico..."); break;
+                case 5: derrubarUsuarios(); break;
+                case 6: enviarMensagem(); break;
+                case 7: System.out.println("Encerrando módulo técnico..."); break;
                 default: System.out.println("Opção inválida.");
             }
             if (opcao != 6) {
@@ -173,7 +175,7 @@ public class TelaChat {
     }
 
 
-    private void derrorbarUsuarios() throws IOException {
+    private void derrubarUsuarios() throws IOException {
         System.out.println("Digite o(s) login(s) a derrubar (ou 'TODOS'): ");
         String alvos = leitor.readLine();
         if (alvos == null || alvos.trim().isEmpty()) return;
