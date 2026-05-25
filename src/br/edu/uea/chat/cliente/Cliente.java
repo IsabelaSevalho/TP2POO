@@ -6,6 +6,7 @@ import java.io.ObjectOutputStream;
 import java.net.Socket;
 import br.edu.uea.chat.cliente.ServidorThread;
 import br.edu.uea.chat.model.Mensagem;
+import br.edu.uea.chat.model.Tecnico;
 import br.edu.uea.chat.model.Usuario;
 
 /**
@@ -26,6 +27,11 @@ public class Cliente {
     public Cliente() {
         this.conectado = false;
     }
+
+    public Usuario getUsuarioLogado() {
+        return this.usuarioLogado;
+    }
+
     
     public boolean conectar(String ip) {
          try {
@@ -119,21 +125,26 @@ public class Cliente {
         }
     }
     
-    public boolean loginSincrono(Usuario usuario) {
+        public boolean loginSincrono(Usuario usuario) {
         if (!conectado) return false;
         try {
             Mensagem protocoloLogin = new Mensagem("LOGIN", null, usuario, null);
             saida.writeObject(protocoloLogin);
             saida.flush();
 
+            // O cliente lê o objeto que o Servidor enviou
             Object resposta = entrada.readObject();
-            if ("CONFIRMACAO_LOGIN_OK".equals(resposta)) {
-                this.usuarioLogado = usuario;
+            
+            // Se a resposta for a instância real do Usuário (Tecnico/Aluno/Professor)
+            if (resposta instanceof Usuario) {
+                this.usuarioLogado = (Usuario) resposta; // Guarda a instância correta vinda do banco!
+                
                 // Inicializa a thread de escuta
                 ServidorThread ouvinte = new ServidorThread(this.socket, this.entrada);
                 new Thread(ouvinte).start();
                 return true;
             }
+            
             return false;
         } catch (Exception e) {
             System.err.println("Erro no login síncrono: " + e.getMessage());
@@ -153,4 +164,15 @@ public class Cliente {
             return null;
         }
     }
+
+    public void enviarComandoSemResposta(Mensagem msg) {
+        if (!conectado) return;
+        try {
+            saida.writeObject(msg);
+            saida.flush();
+        } catch (IOException e) {
+            System.err.println("Erro ao enviar comando assíncrono: " + e.getMessage());
+        }
+    }
+
 }

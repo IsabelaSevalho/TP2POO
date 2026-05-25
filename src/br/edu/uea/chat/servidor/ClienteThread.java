@@ -76,10 +76,12 @@ public class ClienteThread extends Thread{
                             boolean loginRealizado = usuarioControl.login(usuarioLogin.getUser(), usuarioLogin.getSenha());
 
                             if(loginRealizado){
+                                // Busca o objeto real do banco (ex: Técnico ou Aluno)
                                 this.usuarioLogado = usuarioControl.buscarUsuario(usuarioLogin.getUser());
                                 Servidor.addClienteOnline(this);
                                 
-                                enviarObjetoAoServidor("CONFIRMACAO_LOGIN_OK");
+                                // CORREÇÃO DEFINITIVA: Envia o objeto real encontrado de volta para o Cliente!
+                                enviarObjetoAoServidor(this.usuarioLogado); 
                                 System.out.println("Servidor/ClienteThread: Usuário " + this.usuarioLogado.getUser() + " entrou online.");
 
                                 ArrayList<Mensagem> pendentes = msgControl.entregarMensagensPendentes(this.usuarioLogado.getUser());
@@ -91,6 +93,7 @@ public class ClienteThread extends Thread{
                                 enviarObjetoAoServidor("LOGIN_INVALIDO");
                             }
                             break;
+
 
                         case "LISTAR":
                             // Gera lista com status online/offline
@@ -179,19 +182,19 @@ public class ClienteThread extends Thread{
                     }
                 }
             }
-        } catch (Exception e) {
-            System.err.println("Servidor/ClienteThread: Erro fatal: " + e.getMessage());
-            e.printStackTrace();
+        }catch (java.net.SocketException e) {
+            System.out.println("Servidor: Conexão encerrada com o cliente (" + 
+                (usuarioLogado != null ? usuarioLogado.getUser() : "Desconhecido") + ").");
+        } catch (ClassNotFoundException e) {
+            System.err.println("Erro de classe não encontrada: " + e.getMessage());
+        } catch (IOException e) {
+            System.err.println("Erro de E/S na thread do cliente: " + e.getMessage());
         } finally {
-            if (usuarioLogado != null) {
+            if (this.usuarioLogado != null) {
                 Servidor.removeClienteOnline(this);
-                System.out.println("Servidor/ClienteThread: " + usuarioLogado.getUser() + " removido da lista de online.");
+                System.out.println("Servidor: " + usuarioLogado.getUser() + " removido da lista de ativos.");
             }
-            try {
-                socket.close();
-            } catch (IOException e) {
-                e.printStackTrace();
-            }
+            desconectar();
         }
 	}
     
