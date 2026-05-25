@@ -27,7 +27,6 @@ public class MensagemController {
 		filaPendentes.add(msg);
 		
 		mensagemDAO.salvarMensagens(filaPendentes);
-		System.out.println("MensagemController: Mensagem armazenada para o usuário offline: " + msg.getDestinatario());
 	}
 	
 	public synchronized ArrayList<Mensagem> entregarMensagensPendentes(String loginUsuario) {
@@ -37,16 +36,14 @@ public class MensagemController {
 
 		for (Mensagem msg : todasAsMensagens) {
 			if (msg.getDestinatario().equals(loginUsuario)) {
-				mensagensDoUsuario.add(msg); //guarda para entregar a ele
+				mensagensDoUsuario.add(msg); 
 			} else {
-				mensagensDeOutros.add(msg);  //msantém na lista do arquivo
+				mensagensDeOutros.add(msg);
 			}
 		}
 
-		//achou mensagens dele, ent atualiza o arquivo removendo-as (já que serão entregues)
 		if (!mensagensDoUsuario.isEmpty()) {
 			mensagemDAO.salvarMensagens(mensagensDeOutros);
-			System.out.println("MensagemController: " + mensagensDoUsuario.size() + " mensagens resgatadas para " + loginUsuario);
 		}
 
 		return mensagensDoUsuario;

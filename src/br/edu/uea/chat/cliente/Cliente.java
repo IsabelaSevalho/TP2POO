@@ -6,6 +6,7 @@ import java.io.ObjectOutputStream;
 import java.net.Socket;
 import br.edu.uea.chat.cliente.ServidorThread;
 import br.edu.uea.chat.model.Mensagem;
+import br.edu.uea.chat.model.Tecnico;
 import br.edu.uea.chat.model.Usuario;
 
 /**
@@ -26,6 +27,10 @@ public class Cliente {
     public Cliente() {
         this.conectado = false;
     }
+
+    public Usuario getUsuarioLogado() {
+        return this.usuarioLogado;
+    }
     
     public boolean conectar(String ip) {
          try {
@@ -37,7 +42,6 @@ public class Cliente {
             this.entrada = new ObjectInputStream(socket.getInputStream());
             this.conectado = true;
             
-            System.out.println("Cliente: Conectado com sucesso na porta 5000.");
             return true;
         } catch (IOException e) {
             System.err.println("Erro ao conectar: " + e.getMessage());
@@ -52,15 +56,12 @@ public class Cliente {
             
             saida.writeObject(protocoloLogin);
             saida.flush();
-            System.out.println("Cliente: Solicitação de login enviada.");
             
-            //ler a confirmação do Servidor antes de disparar a Thread
             Object resposta = entrada.readObject();
             
             if (resposta instanceof String && "CONFIRMACAO_LOGIN_OK".equals(resposta)) {
                 this.usuarioLogado = usuario;
                 
-                // Inicializa a thread de escuta passando a stream de entrada 
                 ServidorThread ouvinte = new ServidorThread(this.socket, this.entrada);
                 new Thread(ouvinte).start();
             }
@@ -77,7 +78,6 @@ public class Cliente {
             
             saida.writeObject(protocoloListar);
             saida.flush();
-            System.out.println("Cliente: Pedido de listagem enviado ao servidor.");
         
         } catch (IOException e) {
             System.err.println("Erro ao pedir status: " + e.getMessage());
@@ -101,7 +101,6 @@ public class Cliente {
             Mensagem protocoloKill = new Mensagem("KILL", alvos, null, null);
             saida.writeObject(protocoloKill);
             saida.flush();
-            System.out.println("Cliente: Comando de derrubada enviado pelo Tecnico.");
         
         } catch (IOException e) {
             System.err.println("Erro ao disparar comando KILL: " + e.getMessage());
@@ -119,7 +118,7 @@ public class Cliente {
         }
     }
     
-    public boolean loginSincrono(Usuario usuario) {
+        public boolean loginSincrono(Usuario usuario) {
         if (!conectado) return false;
         try {
             Mensagem protocoloLogin = new Mensagem("LOGIN", null, usuario, null);
@@ -127,13 +126,15 @@ public class Cliente {
             saida.flush();
 
             Object resposta = entrada.readObject();
-            if ("CONFIRMACAO_LOGIN_OK".equals(resposta)) {
-                this.usuarioLogado = usuario;
-                // Inicializa a thread de escuta
+            
+            if (resposta instanceof Usuario) {
+                this.usuarioLogado = (Usuario) resposta;
+                
                 ServidorThread ouvinte = new ServidorThread(this.socket, this.entrada);
                 new Thread(ouvinte).start();
                 return true;
             }
+            
             return false;
         } catch (Exception e) {
             System.err.println("Erro no login síncrono: " + e.getMessage());
@@ -141,7 +142,6 @@ public class Cliente {
         }
     }
 
-    // Método para enviar comando e aguardar resposta 
     public Object enviarComandoComResposta(Mensagem msg) {
         if (!conectado) return null;
         try {
@@ -153,4 +153,15 @@ public class Cliente {
             return null;
         }
     }
+
+    public void enviarComandoSemResposta(Mensagem msg) {
+        if (!conectado) return;
+        try {
+            saida.writeObject(msg);
+            saida.flush();
+        } catch (IOException e) {
+            System.err.println("Erro ao enviar comando assíncrono: " + e.getMessage());
+        }
+    }
+
 }

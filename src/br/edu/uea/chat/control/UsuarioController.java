@@ -35,7 +35,7 @@ public class UsuarioController {
 		return null;
 	}
 	
-	public boolean cadastrarUsuario(Usuario usuario) { //apenas tecnicos podem executar essa ação
+	public boolean cadastrarUsuario(Usuario usuario) {
 		Usuario u = buscarUsuario(usuario.getUser());
 	    if (u != null) return false;
 	    
@@ -56,7 +56,7 @@ public class UsuarioController {
 		return true;
 	}
 	
-	public ArrayList<Usuario> getUsuarios(){//para listagem
+	public ArrayList<Usuario> getUsuarios(){
 		return usuarios;
 	}
 	

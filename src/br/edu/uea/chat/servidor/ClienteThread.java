@@ -55,7 +55,6 @@ public class ClienteThread extends Thread{
 
                     switch(acao){
                         case "CADASTRO":
-                            // Verifica se o usuário logado é técnico
                             if (usuarioLogado == null || !(usuarioLogado instanceof Tecnico)) {
                                 enviarObjetoAoServidor("ERRO_PERMISSAO: Apenas técnicos podem cadastrar usuários.");
                                 System.out.println("Servidor/ClienteThread: Tentativa de cadastro sem permissão.");
@@ -79,7 +78,7 @@ public class ClienteThread extends Thread{
                                 this.usuarioLogado = usuarioControl.buscarUsuario(usuarioLogin.getUser());
                                 Servidor.addClienteOnline(this);
                                 
-                                enviarObjetoAoServidor("CONFIRMACAO_LOGIN_OK");
+                                enviarObjetoAoServidor(this.usuarioLogado); 
                                 System.out.println("Servidor/ClienteThread: Usuário " + this.usuarioLogado.getUser() + " entrou online.");
 
                                 ArrayList<Mensagem> pendentes = msgControl.entregarMensagensPendentes(this.usuarioLogado.getUser());
@@ -92,8 +91,8 @@ public class ClienteThread extends Thread{
                             }
                             break;
 
+
                         case "LISTAR":
-                            // Gera lista com status online/offline
                             ArrayList<Usuario> todosUsuarios = usuarioControl.getUsuarios();
                             ArrayList<Usuario> listaComStatus = new ArrayList<>();
                             
@@ -179,19 +178,19 @@ public class ClienteThread extends Thread{
                     }
                 }
             }
-        } catch (Exception e) {
-            System.err.println("Servidor/ClienteThread: Erro fatal: " + e.getMessage());
-            e.printStackTrace();
+        }catch (java.net.SocketException e) {
+            System.out.println("Servidor: Conexão encerrada com o cliente (" + 
+                (usuarioLogado != null ? usuarioLogado.getUser() : "Desconhecido") + ").");
+        } catch (ClassNotFoundException e) {
+            System.err.println("Erro de classe não encontrada: " + e.getMessage());
+        } catch (IOException e) {
+            System.err.println("Erro de E/S na thread do cliente: " + e.getMessage());
         } finally {
-            if (usuarioLogado != null) {
+            if (this.usuarioLogado != null) {
                 Servidor.removeClienteOnline(this);
-                System.out.println("Servidor/ClienteThread: " + usuarioLogado.getUser() + " removido da lista de online.");
+                System.out.println("Servidor: " + usuarioLogado.getUser() + " removido da lista de ativos.");
             }
-            try {
-                socket.close();
-            } catch (IOException e) {
-                e.printStackTrace();
-            }
+            desconectar();
         }
 	}
     
@@ -219,7 +218,7 @@ public class ClienteThread extends Thread{
                 objectOS.flush();
             }
         } catch (IOException e) {
-            System.out.println("Servidor/ClienteThread: Erro ao enviar objeto ao cliente.");
+            System.err.println("Servidor/ClienteThread: Erro ao enviar objeto ao cliente.");
         }
     }
 
@@ -229,7 +228,7 @@ public class ClienteThread extends Thread{
                 socket.close();
             }
         } catch (IOException e) {
-            System.out.println("Servidor/ClienteThread: Erro ao fechar socket.");
+            System.err.println("Servidor/ClienteThread: Erro ao fechar socket.");
         }
     }
 }
