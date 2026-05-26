@@ -121,11 +121,11 @@ public class TelaChat {
                 case 7: System.out.println("Encerrando módulo técnico..."); break;
                 default: System.out.println("Opção inválida.");
             }
-            if (opcao != 6) {
+            if (opcao != 7) {
                 System.out.println("\nPressione Enter para continuar...");
                 leitor.readLine();
             }
-        } while (opcao != 6);
+        } while (opcao != 7);
     }
 
     private void listarUsuarios() {
